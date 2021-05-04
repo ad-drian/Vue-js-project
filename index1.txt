@@ -1,0 +1,61 @@
+<template>
+        <div id="app">
+            <p class="border p-3" v-for="user in users">
+                {{ user.name }}
+                <button 
+                    type="button" 
+                    @click="deleteUser(user.id)" 
+                    class="p-1 mx-3 float-right btn btn-danger"
+                >
+                    Delete
+                </button>
+            </p>
+            <div>
+                <button 
+                    v-if="next" 
+                    type="button" 
+                    @click="navigate(next)" 
+                    class="m-3 btn btn-primary"
+                >
+                  Next
+                </button>
+                <button 
+                    v-if="prev" 
+                    type="button" 
+                    @click="navigate(prev)" 
+                    class="m-3 btn btn-primary"
+                >
+                  Previous
+                </button>
+            </div>
+        </div>
+    </template>
+    <script>
+    export default {
+      mounted() {
+        this.getUsers();
+      },
+      data() {
+        return {
+          users: {},
+          next: null,
+          prev: null
+        };
+      },
+      methods: {
+        getUsers(address) {
+          axios.get(address ? address : "/api/users").then(response => {
+            this.users = response.data.data;
+            this.prev = response.data.links.prev;
+            this.next = response.data.links.next;
+          });
+        },
+        deleteUser(id) {
+          axios.delete("/api/users/" + id).then(response => this.getUsers())
+        },
+        navigate(address) {
+          this.getUsers(address)
+        }
+      }
+    };
+    </script>
